@@ -1,0 +1,27 @@
+th{
+    width: 100px;
+    background:cornflowerblue;
+    color:white;
+    text-align: center;
+    border:1px solid black;
+}
+td{
+    width:100px;
+    height: 50px;
+    background:whitesmoke;
+    border:1px solid black;
+}
+
+a{
+    margin:0px 20px;
+    color:cornflowerblue;
+    cursor:pointer;
+}
+
+a:hover{
+    text-decoration: none;
+}
+
+h2{
+    width: 400px;
+}
