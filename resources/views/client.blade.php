@@ -52,15 +52,19 @@
 
         <!-- FORM -->
         <div class="container mt-5">
-            <form>
+            <form method="POST" action="/appointment"> 
+                @csrf
                 <input type="text" name="name" placeholder="Your name">
+                @error('name') <div style="color:red">{{ $message }}</div> @enderror
                 <input type="tel" name="phone" placeholder="Your phone">
+                @error('phone') <div style="color:red">{{ $message }}</div> @enderror
                 <select name="contractor">
                     <option value="0" selected disabled>Choose the contractor</option>
                     <option value="1">Contractor 1</option>
                     <option value="2">Contractor 2</option>
                     <option value="3">Contractor 3</option>
                 </select>
+                @error('contractor') <div style="color:red">{{ $message }}</div> @enderror
                 <div class="container d-flex border border-black flex-wrap justify-content-around">
                     <p><input type="checkbox" name="services1"> Services 1</p>
                     <p><input type="checkbox" name="services2"> Services 2</p>
@@ -69,7 +73,8 @@
                     <p><input type="checkbox" name="services5"> Services 5</p>
                     <p><input type="checkbox" name="services6"> Services 6</p>            
                 </div>
-                <input type="text" name="date" placeholder="Choose the date" readonly>
+                <input type="text" name="date" placeholder="Choose the date">
+                @error('date') <div style="color:red">{{ $message }}</div> @enderror
                 <select name="hour">
                     <option value="0" selected disabled>Choose hour</option>
                     <option value="1">09</option>
@@ -82,6 +87,7 @@
                     <option value="8">16</option>
                     <option value="9">17</option>
                 </select>
+                @error('date') <div style="color:red">{{ $message }}</div> @enderror
                 <select name="minute">
                     <option value="0" selected disabled>Choose minute</option>
                     <option value="1">00</option>
@@ -97,7 +103,8 @@
                     <option value="11">50</option>
                     <option value="12">55</option>
                 </select>
-                <button type="submit">Make Appointment</button>
+                @error('minute') <div style="color:red">{{ $message }}</div> @enderror
+                <button type="submit" class="btn btn-primary">Make Appointment</button>
             </form>
         </div>
 

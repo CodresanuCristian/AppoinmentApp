@@ -3,6 +3,8 @@
 use App\Http\Controllers\ClientCalendarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +17,9 @@ use App\Http\Controllers\Controller;
 |
 */
 
-Route::get('/{month}', function () {
-    return view('client');
+Route::get('/', function () {
+    return redirect('/'.Carbon::now()->month);
 });
 
 Route::get('/{month}', [ClientCalendarController::class, 'CreateCalendar']);
+Route::post('/appointment', [ClientCalendarController::class, 'NewAppointment']);

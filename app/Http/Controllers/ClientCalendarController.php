@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Reflector;
+use App\Models\Client;
+
 
 class ClientCalendarController extends Controller
 {
@@ -32,6 +33,34 @@ class ClientCalendarController extends Controller
     }
 
 
+    public function NewAppointment(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'contractor' => 'required',
+            'services' => 'required',
+            'date' => 'required',
+            'start_hour' => 'required',
+            'start_minute' => 'required'
+        ]);
+
+        $data = new Client;
+
+        $data->name = $request['name'];
+        $data->phone = $request['phone'];
+        $data->contractor = $request['contractor'];
+        $data->services = $request['services'];
+        $data->date = $request['date'];
+        $data->start_hour = $request['hour'];
+        $data->start_minute = $request['minute'];
+        $data->finish_hour = '2';
+        $data->finish_minute = '1';
+
+        $data->save();
+
+        return redirect('/');
+    }
     
 
 }
