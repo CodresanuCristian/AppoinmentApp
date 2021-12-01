@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ClientCalendarController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginController;
 use Carbon\Carbon;
 
 
@@ -23,3 +23,25 @@ Route::get('/', function () {
 
 Route::get('/{month}-{year}', [ClientCalendarController::class, 'CreateCalendar']);
 Route::post('/appointment', [ClientCalendarController::class, 'NewAppointment']);
+Route::post('/contractor', [LoginController::class, 'userLogin']);
+// Route::view('/contractor', 'contractor');
+Route::get('/contractor', function(){
+    if (session()->has('username'))
+        return view('contractor');
+    else
+        return redirect('login');
+});
+
+Route::get('/login', function(){
+    if (session()->has('username'))
+        return view('contractor');
+    else
+        return view('login');
+});
+
+Route::get('/logout', function(){
+    if (session()->has('username'))
+        session()->pull('username');
+    
+    return redirect('login');
+});
