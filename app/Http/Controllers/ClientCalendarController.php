@@ -9,27 +9,21 @@ use App\Models\Client;
 
 class ClientCalendarController extends Controller
 {
-    public function CreateCalendar(Request $request, $getMonth)
+    public function CreateCalendar(Request $request, $getMonth, $getYear)
     {
-        $date_now = Carbon::now();
-
-        if ($getMonth == 'home')
-            $getMonth = $date_now->month;
-
-        $getMonth = (int)$getMonth;
-        $changed_date = Carbon::createFromDate($date_now->year, $getMonth, '1');
-        
+        $changed_date = Carbon::createFromDate($getYear, $getMonth, '1');
         $calendar = [
-            'year' => $changed_date->format("Y"),
-            'month' => $changed_date->format("F"),
-            'monthNow' => $changed_date->month,
-            'today' => $date_now->day,
+            'year' => $changed_date->format('Y'),
+            'month' => $changed_date->format('F'),
+            'monthDigit' => $changed_date->month,
+            'today' => Carbon::now()->day,
             'daysInMonth' => $changed_date->daysInMonth,
             'skipDays' => $changed_date->dayOfWeek,
-            'dayBoxes' => $changed_date->daysInMonth + $changed_date->dayOfWeek,
+            'dayTiles' => $changed_date->daysInMonth + $changed_date->dayOfWeek
         ];
-        
+
         return view('client')->with(['calendar' => $calendar]);
+
     }
 
 
@@ -37,12 +31,12 @@ class ClientCalendarController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'phone' => 'required',
+            'phone' => 'required|digits:10',
             'contractor' => 'required',
-            'services' => 'required',
             'date' => 'required',
-            'start_hour' => 'required',
-            'start_minute' => 'required'
+            'hour' => 'required',
+            'minute' => 'required',
+            'services' => 'required'
         ]);
 
         $data = new Client;

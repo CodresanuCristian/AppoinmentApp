@@ -18,8 +18,8 @@ use Carbon\Carbon;
 */
 
 Route::get('/', function () {
-    return redirect('/'.Carbon::now()->month);
+    return redirect('/'.Carbon::now()->month.'-'.Carbon::now()->year);
 });
 
-Route::get('/{month}', [ClientCalendarController::class, 'CreateCalendar']);
+Route::get('/{month}-{year}', [ClientCalendarController::class, 'CreateCalendar']);
 Route::post('/appointment', [ClientCalendarController::class, 'NewAppointment']);
