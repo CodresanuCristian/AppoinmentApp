@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\ClientCalendarController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LoginController;
-use Carbon\Carbon;
 
+use Carbon\Carbon;
+use App\Http\Controllers\ClientCalendarController;
+use App\Http\Controllers\ContractorController;
+use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,25 +24,31 @@ Route::get('/', function () {
 
 Route::get('/{month}-{year}', [ClientCalendarController::class, 'CreateCalendar']);
 Route::post('/appointment', [ClientCalendarController::class, 'NewAppointment']);
-Route::post('/contractor', [LoginController::class, 'userLogin']);
-// Route::view('/contractor', 'contractor');
+
+
+
 Route::get('/contractor', function(){
-    if (session()->has('username'))
-        return view('contractor');
-    else
-        return redirect('login');
-});
+    return redirect('contractor/'.Carbon::now()->month.'-'.Carbon::now()->year);
+})->middleware('protectedPage');
+
+
+Route::get('/contractor/{month}-{year}', [ContractorController::class, 'CreateCalendar']) -> middleware('protectedPage');
+Route::post('/contractor', [LoginController::class, 'userLogin']);
+
+
 
 Route::get('/login', function(){
     if (session()->has('username'))
-        return view('contractor');
+        return redirect('contractor/'.Carbon::now()->month.'-'.Carbon::now()->year);
     else
         return view('login');
 });
+
 
 Route::get('/logout', function(){
     if (session()->has('username'))
         session()->pull('username');
     
-    return redirect('login');
+    return redirect('/login');
 });
+
