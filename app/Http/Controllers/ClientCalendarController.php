@@ -53,7 +53,10 @@ class ClientCalendarController extends Controller
 
         $data->save();
 
-        return redirect('/');
+        if ($request['page'] == 'client')
+            return redirect('/');
+        else
+            return redirect('/contractor');
     }
     
 

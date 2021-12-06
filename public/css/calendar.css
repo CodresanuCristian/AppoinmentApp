@@ -12,22 +12,16 @@ td{
     border:1px solid black;
 }
 
-a{
+.arrow{
     margin:0px 20px;
     color:cornflowerblue;
     cursor:pointer;
 }
 
-a:hover{
+.arrow:hover{
     text-decoration: none;
 }
 
-h2{
+.calendar-header{
     width: 400px;
-}
-
-input[type=text], input[type=tel], select{
-    width: 250px;
-    height: 30px;
-    margin: 10px;
 }

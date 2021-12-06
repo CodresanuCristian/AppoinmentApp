@@ -27,14 +27,22 @@ Route::post('/appointment', [ClientCalendarController::class, 'NewAppointment'])
 
 
 
+
 Route::get('/contractor', function(){
     return redirect('contractor/'.Carbon::now()->month.'-'.Carbon::now()->year);
 })->middleware('protectedPage');
 
-
 Route::get('/contractor/{month}-{year}', [ContractorController::class, 'CreateCalendar']) -> middleware('protectedPage');
-Route::post('/contractor', [LoginController::class, 'userLogin']);
-
+Route::get('/showlist', [ContractorController::class, 'ChangeDate']) -> middleware('protectedPage');
+Route::get('/delapp', [ContractorController::class, 'DeleteAppointment']) -> middleware('protectedPage');
+Route::post('/contractor', [LoginController::class, 'UserLogin']);
+Route::post('/addnewcontractor', [ContractorController::class, 'AddNewContractor']) -> middleware('protectedPage');
+Route::post('/adddaysoff', [ContractorController::class, 'AddDaysOff']) -> middleware('protectedPage');
+Route::post('/addholiday', [ContractorController::class, 'AddHoliday']) -> middleware('protectedPage');
+Route::get('/showcontractordetails', [ContractorController::class, 'ShowContractorDetails']) -> middleware('protectedPage');
+Route::get('/deletecontractor', [ContractorController::class, 'DeleteContractor']) -> middleware('protectedPage');
+Route::get('/deletedaysoff', [ContractorController::class, 'DeleteDaysOff']) -> middleware('protectedPage');
+Route::get('/deleteholiday', [ContractorController::class, 'DeleteHoliday']) -> middleware('protectedPage');
 
 
 Route::get('/login', function(){
@@ -45,10 +53,11 @@ Route::get('/login', function(){
 });
 
 
+
+
 Route::get('/logout', function(){
     if (session()->has('username'))
         session()->pull('username');
     
     return redirect('/login');
 });
-

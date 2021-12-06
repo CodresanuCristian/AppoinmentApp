@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class LoginController extends Controller
 {
-    function userLogin(Request $request)
+    function UserLogin(Request $request)
     {
         $input_data = $request->input();
         $db_data = new Contractor;
