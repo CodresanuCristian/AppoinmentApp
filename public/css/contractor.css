@@ -16,7 +16,7 @@ td{
 
 .appList{
     overflow-y: scroll;
-    max-height: 80%;
+    height: 90%;
     background-color: lightgray;
 }
 
@@ -35,4 +35,33 @@ td{
 
 .contractordetailsform{
     display:none;
+}
+
+.new-line{
+    padding: 20px;
+    border-top: 1px solid gray;
+}
+
+.new-line:last-child{
+    border-bottom: 1px solid gray;
+}
+
+.new-line-data{
+    margin: 5px auto;
+}
+
+.editbtn, .deletebtn{
+    margin-right:10px;
+    margin-top: 10px;
+    width:80px;
+}
+
+.appList-editForm{
+    position: absolute;
+    top:0;
+    left:0;
+    display:none;
+    background-color: cadetblue;
+    margin: 40vh 5vh;
+    color:white;
 }

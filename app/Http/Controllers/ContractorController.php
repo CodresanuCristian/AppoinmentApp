@@ -37,6 +37,9 @@ class ContractorController extends Controller
     }
 
 
+
+
+
     // CONTRACTOR DETAILS =========================================================================================================
     public function AddNewContractor(Request $request)
     {
@@ -134,19 +137,50 @@ class ContractorController extends Controller
     }
 
 
-/*
-    public function ChangeDate(Request $request)
+
+
+
+    // APPOINTMENT LIST =========================================================================================================
+    public function ShowAppList(Request $request)
     {
-        return response()->json(array('newDate'=> $request['date_filter']));
+        $db_clients = new Client;
+        $db_clients = $db_clients->where('date', $request['date_tile'])->get();
+
+        return response()->json(['list' => $db_clients]);
     }
 
 
 
     public function DeleteAppointment(Request $request)
     {
-        $db_appointment = new Client;
-        $db_appointment = $db_appointment->where('id', $request['id'])->delete();
+        $db_clients = new Client;
+        $db_clients->where('id', $request['id'])->delete();
 
-        return redirect('/contractor');
-    }*/
+        return back();
+    }
+    
+
+
+    public function EditAppointment(Request $request)
+    {
+        $db_clients = new Client;
+
+        if ($request['start_hour'] != null)
+            $db_clients->where('id', $request['id'])->update(['start_hour'=>$request['start_hour']]);
+        if ($request['start_minute'] != null)
+            $db_clients->where('id', $request['id'])->update(['start_minute'=>$request['start_minute']]);
+        if ($request['finish_hour'] != null)
+            $db_clients->where('id', $request['id'])->update(['finish_hour'=>$request['finish_hour']]);
+        if ($request['finish_minute'] != null)
+            $db_clients->where('id', $request['id'])->update(['finish_minute'=>$request['finish_minute']]);
+        if ($request['name'] != null)
+            $db_clients->where('id', $request['id'])->update(['name'=>$request['name']]);
+        if ($request['phone'] != null)
+            $db_clients->where('id', $request['id'])->update(['phone'=>$request['phone']]);
+        if ($request['services'] != null)
+            $db_clients->where('id', $request['id'])->update(['services'=>$request['services']]);
+
+
+        return back();
+    }
 }

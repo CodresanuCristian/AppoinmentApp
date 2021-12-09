@@ -40,9 +40,35 @@
 
         <!-- APPOINTMENT LIST -->
         <div class="appList-window">
-            <h3 class="appList-header text-center m-4" id="close-appList-window"></h3>
-            <div class="appList"></div>
-        </div>        
+            <h5 class="text-right m-1" id="close-appwindow" style="cursor:pointer;">close</h5>
+            <h3 class="appList-header text-center m-4"></h3>
+            <div class="appList" id="appList"></div>
+        </div>
+        
+        
+        <!-- APPOINMENT LIST -> EDIT FORM -->
+        <div class="appList-editForm">
+            <h5 class="text-right m-1" id="close-editForm" style="cursor:pointer;">close</h5>
+            <form method="post" action="/editappointment" id="editForm" class="text-center">
+                @csrf
+                <input type="text" name="start_hour" placeholder="Start hour">
+                <input type="text" name="start_minute" placeholder="Start minute">
+                <input type="text" name="finish_hour" placeholder="Finish hour">
+                <input type="text" name="finish_minute" placeholder="finish minute">
+                <input type="text" name="name" placeholder="Name">
+                <input type="tel" name="phone" placeholder="Phone">
+                <div class="container d-flex flex-wrap justify-content-around">
+                    <p id="edit-service-text-1"><input type="checkbox" id="edit-service-1" class="edit-input" name="services"> Service 1</p>
+                    <p id="edit-service-text-2"><input type="checkbox" id="edit-service-2" class="edit-input" name="services"> Service 2</p>
+                    <p id="edit-service-text-3"><input type="checkbox" id="edit-service-3" class="edit-input" name="services"> Service 3</p>
+                    <p id="edit-service-text-4"><input type="checkbox" id="edit-service-4" class="edit-input" name="services"> Service 4</p>
+                    <p id="edit-service-text-5"><input type="checkbox" id="edit-service-5" class="edit-input" name="services"> Service 5</p>
+                    <p id="edit-service-text-6"><input type="checkbox" id="edit-service-6" class="edit-input" name="services"> Service 6</p>            
+                </div>
+                <input type="text" name="id" id="input_id" hidden>
+                <button type="submit" class="btn btn-warning" id="updateAppBtn">Apply</button>
+            </form>
+        </div>
 
 
 
@@ -85,8 +111,6 @@
 
                 $('#contractorDetails').click(function(){
                     $('.contractordetailsform').toggle();
-                    // if ($('.contractordetailsform').is(':visible'))
-                        // ShowContractorDetails();
                 });
 
                 $('td').click(function(){
@@ -94,18 +118,68 @@
                         $("#date").val(($(this).attr("id")+" "+calendar['month']+" "+calendar['year']));
                         $("#adddaysoff").val(($(this).attr("id")+" "+calendar['month']+" "+calendar['year']));
                     }
-                    else
-                        $(".appList-window").show();
                 });
 
-                $('#close-appList-window').click(function(){
+
+
+
+                // APPOINTMENT LIST - SHOW/HIDE LIST
+                $('td').click(function(){
+                    if (($('.newappform').is(':visible') == false) && ($('.contractordetailsform').is(':visible')) == false){    
+                        var day = $(this).attr('id');
+                        var month = calendar['month'];
+                        var year = calendar['year'];
+
+                        $.ajax({
+                            type:'GET',
+                            url: '/showapplist',
+                            data: {date_tile: day+' '+month+' '+year},
+                            success: function(date_tile){
+                                for (let i=0; i<date_tile.list.length; i++)
+                                    CreateList(date_tile.list[i]['id'], date_tile.list[i]['start_hour']+':'+date_tile.list[i]['start_minute'], date_tile.list[i]['name']+' - '+date_tile.list[i]['services'], date_tile.list[i]['phone']);
+                                $('.appList-header').text(day+' '+month);
+                                $('.appList-window').show();
+                            },
+                        });
+                    }
+                });
+
+                $('.appList-window').on('click','#close-appwindow', function(){
                     $('.appList-window').hide();
+                    $('.appList').empty();
+                });
+
+
+
+                // APPOINTMENT LIST - BUTTONS
+                $('.appList').on('click','.deletebtn', function(){
+                    $.ajax({
+                        type:'GET',
+                        url:'/deleteappointment',
+                        data: {id:$(this).attr('value')},
+                        success: function(){
+                            $('.appList-window').hide();
+                            $('.appList').empty();
+                            alert('Appointment removed');
+                        }
+                    });
+                });
+                
+                $('.appList').on('click','.editbtn', function(){
+                    $('.appList-editForm').show();
+                    $('#input_id').attr('value', $(this).attr('value'));
+                });
+
+                $('.appList-editForm').on('click','#close-editForm', function(){
+                    $('.appList-editForm').hide();
                 });
 
 
 
 
 
+
+                // MY FUNCTIONS 
                 function ShowContractorDetails()
                 {
                     $.ajax({
@@ -114,17 +188,17 @@
                         dataType: 'json',
                         success: function(data){
                             for (let i=0; i<data.contractor.length; i++)
-                                createOption('deletecontractor', data.contractor[i]['username'], false);
+                                CreateOption('deletecontractor', data.contractor[i]['username'], false);
                             for (let i=0; i<data.contractor_details.length; i++){
-                                createOption('deletedaysoff', data.contractor_details[i]['days_off'], false);
-                                createOption('deleteholiday',data.contractor_details[i]['start_holiday']+' / '+data.contractor_details[i]['finish_holiday'], true);
+                                CreateOption('deletedaysoff', data.contractor_details[i]['days_off'], false);
+                                CreateOption('deleteholiday',data.contractor_details[i]['start_holiday']+' / '+data.contractor_details[i]['finish_holiday'], true);
                             }
                         }
                     });
                 }
 
 
-                function createOption(father, value, holiday)
+                function CreateOption(father, value, holiday)
                 {
                     if ((value != '') && (value != ' / ')){
                         var option = document.createElement('option');
@@ -137,79 +211,46 @@
                     }
                 }
 
-                
 
+                function CreateList(index, clockVal, titleVal, phoneVal)
+                {
+                    var newLine = document.createElement('div');
+                    newLine.setAttribute('class', 'new-line');
+                    newLine.setAttribute('id', 'new-line'+index);
+                    document.getElementById('appList').appendChild(newLine);
 
+                    var clock = document.createElement('p');
+                    clock.setAttribute('class', 'new-line-data');
+                    clock.setAttribute('id', 'clock'+index);
+                    clock.innerHTML = clockVal;
+                    document.getElementById('new-line'+index).appendChild(clock);
 
+                    var title = document.createElement('p');
+                    title.setAttribute('class', 'new-line-data');
+                    title.setAttribute('id', 'title'+index);
+                    title.innerHTML = titleVal;
+                    document.getElementById('new-line'+index).appendChild(title);
 
+                    var phone = document.createElement('p');
+                    phone.setAttribute('class', 'new-line-data');
+                    phone.setAttribute('id', 'phone'+index);
+                    phone.innerHTML = phoneVal;
+                    document.getElementById('new-line'+index).appendChild(phone);                    
 
+                    var editBtn = document.createElement('button');
+                    editBtn.setAttribute('class', 'btn btn-success editbtn');
+                    editBtn.setAttribute('id', 'editbtn'+index);
+                    editBtn.setAttribute('value',index);
+                    editBtn.innerHTML = "Edit";
+                    document.getElementById('new-line'+index).appendChild(editBtn);
 
-
-
-
-// =================================================
-
-
-                // // APPOINTMENT LIST - SHOW LIST
-                // $('td').click(function(){
-                //     $.ajax({
-                //         type:'get',
-                //         url: '/showlist',
-                //         data: {date_filter: $(this).attr('id')+' '+calendar['month']+' '+calendar['year']},
-                //         success: function(response){
-                //             ShowList(client, response.newDate);
-                //         },
-                //     });
-                // });
-
-
-                // function ShowList(client, date)
-                // {
-                //     $('#close-appList-window').text(date+' (close)');
-                //     // $(".appList-window").css({'display':'inherit'});
-
-                //     var clock, title, phone, userBox, editBtn, delBtn;
-
-                //     for (let i=0; i < client.length; i++){
-                //         if (date == client[i]['date']){
-                //             userBox = document.createElement('div');
-                //             userBox.setAttribute('class', 'userbox');
-                //             userBox.setAttribute('id', 'userbox'+client[i]['id']);
-                //             $('.appList').append(userBox);
-
-                //             clock = $(document.createElement('p'));
-                //             clock.attr('class','data-hour m-0');
-                //             clock.attr('id', 'clock'+client[i]['id']);
-                //             clock.text(client[i]['start_hour'] + ':' + client[i]['start_minute']);
-                //             $('#userbox'+client[i]['id']).append(clock);
-
-                //             title = $(document.createElement('p'));
-                //             title.attr('class','data-title m-0');
-                //             title.attr('id', 'title'+client[i]['id']);
-                //             title.text(client[i]['name'] + ' - ' + client[i]['services']);
-                //             $('#userbox'+client[i]['id']).append(title);
-
-                //             phone = $(document.createElement('p'));
-                //             phone.attr('class','data-phone m-0');
-                //             phone.attr('id', 'phone'+client[i]['id']);
-                //             phone.text(client[i]['phone']);
-                //             $('#userbox'+client[i]['id']).append(phone);
-
-                //             editBtn = $(document.createElement('button'));
-                //             editBtn.attr('class','btn btn-warning m-2 editBtn');
-                //             editBtn.attr('id','editBtn'+client[i]['id']);
-                //             editBtn.text('Edit');
-                //             $('#userbox'+client[i]['id']).append(editBtn);
-
-                //             delBtn = document.createElement('button');
-                //             delBtn.setAttribute('class','pula');
-                //             delBtn.setAttribute('id','delBtn'+client[i]['id']);
-                //             // delBtn.('Delete');
-                //             $('#userbox'+client[i]['id']).appendChild(delBtn);
-                //         }
-                //     }
-                // }
-
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.setAttribute('class', 'btn btn-danger deletebtn');
+                    deleteBtn.setAttribute('id', 'deletebtn'+index);
+                    deleteBtn.setAttribute('value',index);
+                    deleteBtn.innerHTML = "Delete";
+                    document.getElementById('new-line'+index).appendChild(deleteBtn);
+                }
             });
         </script>
     </body>
