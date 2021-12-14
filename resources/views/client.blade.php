@@ -39,7 +39,6 @@
                 for(let day=1; day<=calendar['daysInMonth']; day++)
                     if (((day == calendar['today']) && (current_month == calendar['monthDigit'])) && (current_year == calendar['year']))
                         $("#"+day).css({'background':'cornflowerblue', 'color':'white', 'font-weight':'bold'});
-                
 
 
                 // CHANGE THE CURSOR ACCORDING TO THE VALIDITY OF DAYS
@@ -63,7 +62,7 @@
 
 
                 // CLICK AND HOVER TILES
-                $("td").click(function(){
+                $('table').on('click','td', function(){
                     if ($(this).attr("value") == "allowed"){
                         $("#date").val(($(this).attr("id")+" "+calendar['month']+" "+calendar['year']));
                         if ($('#serviceTime').val() != 0)
@@ -88,7 +87,12 @@
                 });
 
 
-                $('input[type=checkbox').click(function(){
+                $('.pservice').click(function(){
+                    if ($('#'+$('#'+$(this).attr('id')+' input[type=checkbox]').attr('id')).is(':checked'))
+                        $('#'+$('#'+$(this).attr('id')+' input[type=checkbox]').attr('id')).prop("checked", false);
+                    else
+                        $('#'+$('#'+$(this).attr('id')+' input[type=checkbox]').attr('id')).prop("checked", true);
+
                     var clock = GetServicesTime();
                     var hour = Math.floor(clock / 60);
                     if (hour != 0){
@@ -127,11 +131,11 @@
 
 
                 function GetSchedule()
-                {
+                {   
                     $.ajax({
                         type: 'GET',
                         url: '/getSchedule',
-                        data: {date: $("#date").val(), servicesTime: GetServicesTime()},
+                        data: {date: $("#date").val(), servicesTime: GetServicesTime(), contractor: $('#contractor option:selected').attr('value')},
                         success: function(schedule){
                             ShowClock(schedule.db);
                         }
@@ -139,11 +143,17 @@
 
                     $('#hour').prop('disabled', false);
                     $('#hour').empty();
+                    $('#minute').prop('disabled', true);
+                    $('#minute').empty();
 
 
 
                     function ShowClock(db)
                     {
+                        const openingHour = 9;
+                        const closingHour = 18;
+                        const minStep = 5;
+                        var rangeTimeByServices = (parseInt($('#serviceTime').val()) / minStep);
 
                         // READ APPOINTMENT CLOCK FROM DATABASE
                         var sh=[], sm=[], fh=[], fm=[];
@@ -155,98 +165,71 @@
                         }
 
 
+                        // CREATE CLOCK ARRAY
+                        var clock = [];
+                        var m = 0;
 
-                        // CREATE A CLOCK MATRIX   9, 10, ... , 17 | -> hour
-                        // -----------------------------------------
-                        //                         0,  0, ... ,  0 |
-                        //                         5,  5, ... ,  5 | -> minutes
-                        //                        ................ |
-                        //                        50, 50, ...., 50 |
-                        //                        55, 55, ... , 55 | 
-                        // ------------------------------------------------------  
-                        // Ex: clock[9][1] = 5      -> it means 09:05
-                        //     clock[17][10] = 50   -> it means 17:50
-                        var clock = new Array(18);
-                        const hour = 9;
-                        var minuteStep = 5;
-                        for (let i=hour; i<clock.length; i++)
-                            clock[i] = new Array(12);
-
-                        for (let i=hour; i<clock.length; i++){
-                            var minute = 0;
-                            for (let j=0; j<clock[i].length; j++){
-                                clock[i][j] = minute;
-                                minute = minute + minuteStep;
-                            }
+                        for (let i=0; i<=((closingHour-openingHour)*(60/minStep)); i++){
+                            clock[i] = m;
+                            if (m < 55)  m = m + minStep;
+                            else         m = 0;
                         }
+                        
 
+
+                        // THE RANGE WICH APPOINTMENTS ARE MADE WILL MARK WITH -1
+                        var mark = false;
+                        for (let i=0; i<sh.length; i++)
+                            for (let j=(sh[i]-openingHour)*12; j<=((fh[i]-openingHour)+1)*12; j++){
+                                if (clock[j] > sm[i])
+                                    mark = true;
+
+                                if ((clock[j] >= fm[i]) && (j >= (fh[i]-openingHour)*12))
+                                    mark = false;
+
+                                if (mark == true)
+                                    clock[j] = -1;
+                            }
 
                         
-                        // THE RANGE WICH APPOINTMENTS ARE MADE WILL MARK WITH -1
-                        for (var i=0; i<db.length; i++){
-                            if (sh[i] == fh[i]){
-                                var aux_min = sm[i]/minuteStep;
-                                while (aux_min <= fm[i]/minuteStep){
-                                    clock[sh[i]][aux_min] = -1;
-                                    aux_min++;
-                                }
-                            }else if (sh[i] != fh[i]){
-                                var aux_hour = sh[i];
-                                var aux_min = sm[i]/minuteStep;
-                                while (aux_hour <= fh[i]){
-                                    clock[aux_hour][aux_min] = -1;
-                                    if (aux_min == 11){
-                                        aux_min = 0;
-                                        aux_hour++;
-                                    }
-                                    else if (aux_hour == fh[i])
-                                        if (aux_min < fm[i]/minuteStep)
-                                            aux_min++;
-                                        else
-                                            aux_hour++;
-                                    else
-                                        aux_min++;
-                                }
-                            }
-                        }
-
-
                         // CREATE OPTIONS FOR HOUR AND MINUTES SELECTOR
                         var opHour = document.createElement('option');
-                            opHour.value = '0';
-                            opHour.innerHTML = 'Choose hour';
-                            opHour.selected = 'select';
-                            opHour.disabled = 'disable';
-                            document.getElementById("hour").appendChild(opHour);
+                        opHour.value = '0';
+                        opHour.innerHTML = 'Choose hour';
+                        opHour.selected = 'select';
+                        opHour.disabled = 'disable';
+                        document.getElementById("hour").appendChild(opHour);
 
-                        var rangeTimeByServices = parseInt($('#serviceTime').val()) / minuteStep;
-                        var rangeTimeStep = 0;
-                        for (let i=clock.length-1; i>=hour; i--)
-                            for (let j=clock[i].length-1; j>=0; j--){
-                                if (clock[i][j] == -1) rangeTimeStep = 0;
-                                else                   rangeTimeStep++;
+                        for (let i=0; i<clock.length; i++){
+                            var acceptRange = true;
+                            if (i+rangeTimeByServices < clock.length){
+                                for (let j=i; j<=i+rangeTimeByServices; j++){
+                                    if (clock[j] == -1){
+                                        acceptRange = false;
+                                        break;
+                                    }
+                                }
 
-                                
-                                if (rangeTimeStep >= rangeTimeByServices){
+                                if (acceptRange == true){
                                     opHour = document.createElement('option');
-                                    if (i == 9){
+                                    if (openingHour+Math.floor(i/12) == 9){
                                         opHour.value = '09';
                                         opHour.innerHTML = '09';
                                     }
-                                    else{
-                                        opHour.value = i;
-                                        opHour.innerHTML = i;
+                                    else{ 
+                                        opHour.innerHTML = openingHour+Math.floor(i/12);
+                                        opHour.value = openingHour+Math.floor(i/12);
                                     }
                                     document.getElementById("hour").appendChild(opHour);
-                                    break;
+                                    i = ((Math.floor(i/12)+1)*12)-1;
                                 }
                             }
-                            
-                        
+                        }
 
                         $('#hour').on('change',function(){
                             $('#minute').empty();
-                            var hour_selected = parseInt($('#hour option:selected').val());
+                            var hour_selected = (parseInt($('#hour option:selected').val()) - openingHour) * 12;
+
                             
                             var opMin = document.createElement('option');
                             opMin.value = '0';
@@ -255,29 +238,36 @@
                             opMin.disabled = 'disable';
                             document.getElementById("minute").appendChild(opMin);
 
-                                for (let j=clock[hour_selected].length-1; j>=0; j--){
-                                    if (clock[hour_selected][j] == -1) rangeTimeStep = 0;
-                                    else                               rangeTimeStep++;
 
-                                
-                                    if (rangeTimeStep >= rangeTimeByServices){
+                            for (let i=hour_selected; i<=hour_selected+11; i++){
+                                var acceptRange = true;
+                                    for (let j=i; j<=i+rangeTimeByServices; j++){
+                                        if (clock[j] == -1){
+                                            acceptRange = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (acceptRange == true){
                                         opMin = document.createElement('option');
-                                        if (j == 0){
+                                        opMin.value = clock[i];
+                                        if (i % 12 == 0){
                                             opMin.value = '00';
                                             opMin.innerHTML = '00';
-                                        }else if (j == 1){
+                                        }
+                                        else if (i % 12 == 1){
                                             opMin.value = '05';
                                             opMin.innerHTML = '05';
-                                        }else{
-                                            opMin.value = clock[hour_selected][j];
-                                            opMin.innerHTML = clock[hour_selected][j];
+                                        }
+                                        else{
+                                            opMin.value = clock[i];
+                                            opMin.innerHTML = clock[i];
                                         }
                                         document.getElementById("minute").appendChild(opMin);
                                     }
-                                }
-                                
-                                $('#minute').prop('disabled', false);
-                                $('#minute option')[0].selected='selected';
+                            }
+                            $('#minute').prop('disabled', false);
+                            $('#minute option')[0].selected='selected';
                         });
                     }
                 }

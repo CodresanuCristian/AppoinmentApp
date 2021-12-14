@@ -9,7 +9,7 @@
         <input type="tel" name="phone" placeholder="Phone">
         @error('phone') <div style="color:red">{{ $message }}</div> @enderror
         <!-- CONTRACTOR SELECTOR -->
-        <select name="contractor">
+        <select name="contractor" id="contractor">
             <option value="0" selected disabled>Choose the contractor</option>
             <option value="Contractor 1">Contractor 1</option>
             <option value="Contractor 2">Contractor 2</option>
@@ -26,12 +26,12 @@
         @error('minute') <div style="color:red">{{ $message }}</div> @enderror
         <!-- SERVICES CHECKBOXES -->
         <div class="container d-flex flex-wrap justify-content-around">
-            <p id="service-text-1"><input type="checkbox" id="service-1" class="newapp-input" name="services"> Service 1</p>
-            <p id="service-text-2"><input type="checkbox" id="service-2" class="newapp-input" name="services"> Service 2</p>
-            <p id="service-text-3"><input type="checkbox" id="service-3" class="newapp-input" name="services"> Service 3</p>
-            <p id="service-text-4"><input type="checkbox" id="service-4" class="newapp-input" name="services"> Service 4</p>
-            <p id="service-text-5"><input type="checkbox" id="service-5" class="newapp-input" name="services"> Service 5</p>
-            <p id="service-text-6"><input type="checkbox" id="service-6" class="newapp-input" name="services"> Service 6</p>            
+            <p id="service-text-1" class="pservice"><input type="checkbox" id="service-1" class="newapp-input" name="services">Service 1</p>
+            <p id="service-text-2" class="pservice"><input type="checkbox" id="service-2" class="newapp-input" name="services">Service 2</p>
+            <p id="service-text-3" class="pservice"><input type="checkbox" id="service-3" class="newapp-input" name="services">Service 3</p>
+            <p id="service-text-4" class="pservice"><input type="checkbox" id="service-4" class="newapp-input" name="services">Service 4</p>
+            <p id="service-text-5" class="pservice"><input type="checkbox" id="service-5" class="newapp-input" name="services">Service 5</p>
+            <p id="service-text-6" class="pservice"><input type="checkbox" id="service-6" class="newapp-input" name="services">Service 6</p>            
         </div>
         @error('services') <div style="color:red">{{ $message }}</div> @enderror
         <!-- REDIRECT PAGE FIELD -->

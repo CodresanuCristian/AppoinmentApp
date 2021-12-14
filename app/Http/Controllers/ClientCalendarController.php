@@ -55,11 +55,11 @@ class ClientCalendarController extends Controller
 
         for ($i=0; $i<count($services); $i++){
             if ($services[$i] == 'Service 1') $service_time = $service_time + 45;
-            if ($services[$i] == ' Service 2') $service_time = $service_time + 35;
-            if ($services[$i] == ' Service 3') $service_time = $service_time + 30;
-            if ($services[$i] == ' Service 4') $service_time = $service_time + 60;
-            if ($services[$i] == ' Service 5') $service_time = $service_time + 20;
-            if ($services[$i] == ' Service 6') $service_time = $service_time + 45;
+            if ($services[$i] == 'Service 2') $service_time = $service_time + 35;
+            if ($services[$i] == 'Service 3') $service_time = $service_time + 30;
+            if ($services[$i] == 'Service 4') $service_time = $service_time + 60;
+            if ($services[$i] == 'Service 5') $service_time = $service_time + 20;
+            if ($services[$i] == 'Service 6') $service_time = $service_time + 45;
         }
         $clock = $clock->addMinutes($service_time);
         
@@ -81,7 +81,7 @@ class ClientCalendarController extends Controller
     public function GetSchedule(Request $request)
     {
         $db_schedule = new Client;
-        $db_schedule = $db_schedule->where('date', $request['date'])->orderBy('start_hour')->get();
+        $db_schedule = $db_schedule->where('date', $request['date'])->where('contractor',$request['contractor'])->orderBy('start_hour')->get();
 
         return response()->json(['db'=>$db_schedule]);
     }
