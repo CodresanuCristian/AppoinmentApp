@@ -144,7 +144,7 @@ class ContractorController extends Controller
     public function ShowAppList(Request $request)
     {
         $db_clients = new Client;
-        $db_clients = $db_clients->where('date', $request['date_tile'])->get();
+        $db_clients = $db_clients->where('contractor', session('username'))->where('date', $request['date_tile'])->orderBy('start_hour')->orderBy('start_minute')->get();
 
         return response()->json(['list' => $db_clients]);
     }
